@@ -16,6 +16,7 @@
       label: "2016 registry",
       url: "data/georgian2016.txt.gz",
       gzipped: true,
+      columns: ["fn", "ln", "id", "email", "mob", "addr", "skip"],
     },
     {
       label: "2020 magti",

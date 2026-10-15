@@ -264,6 +264,7 @@ function classifyByColumns(fields, columns, source) {
       case "addr":     rec.addr = rec.addr ? rec.addr + " " + val : val; break;
       case "district": rec.addr = rec.addr ? rec.addr + ", " + val : val; break;
       case "mob":      rec.mob = normaliseMobile(val); break;
+      case "email":    break;  // ignore for now
       // "skip" and anything else → ignored
     }
   }
