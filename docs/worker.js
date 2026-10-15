@@ -203,7 +203,7 @@ function classifyLine(raw, delim, source) {
   const rec = {
     fn: null, ln: null, father: null, id: null,
     dob: null, by: null, sex: null, addr: null, mob: null,
-    src: source,
+    src: (source && (source.label || source.src)) || source,
   };
   const names = [], leftovers = [];
 
