@@ -69,7 +69,7 @@ async function fetchSource(src, onProgress) {
 }
 
 async function fetchBytes(url, onProgress) {
-  const res = await fetch(url, { cache: "force-cache" });
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`);
   const total = Number(res.headers.get("content-length")) || 0;
 
