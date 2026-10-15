@@ -15,7 +15,7 @@ self.onmessage = async (e) => {
       const results = await Promise.allSettled(msg.sources.map(async (src) => {
         const text = await fetchSource(src, (p) =>
           post({ type: "progress", p, label: `Loading ${src.label}` }));
-        const rows = parseCsvToRecords(text, src.label);
+        const rows = parseCsvToRecords(text, src);
         completed++;
         post({ type: "progress", p: 1,
                label: `${src.label} parsed (${rows.length.toLocaleString()}) — ${completed}/${totalSources} done` });
