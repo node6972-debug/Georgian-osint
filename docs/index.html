@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Georgian OSINT Search</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <h1>Georgian&nbsp;OSINT</h1>
+  </div>
+  <div class="stats" id="stats">Connecting…</div>
+</header>
+
+<main>
+  <section class="search">
+    <div class="searchbar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-4.3-4.3M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Name, surname, father's name, ID (11 digits), mobile, address…" autocomplete="off" autofocus>
+    </div>
+
+    <div class="filters">
+      <div class="filter age">
+        <label>Age</label>
+        <input id="age-min" type="number" min="0" max="120" placeholder="min">
+        <span>–</span>
+        <input id="age-max" type="number" min="0" max="120" placeholder="max">
+      </div>
+
+      <div class="filter">
+        <label>Sex</label>
+        <select id="sex">
+          <option value="">Any</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div>
+
+      <div class="filter">
+        <label>Source</label>
+        <select id="source"><option value="">All</option></select>
+      </div>
+
+      <div class="filter">
+        <label>Sort</label>
+        <select id="sort">
+          <option value="">Default</option>
+          <option value="name">Surname A→Z</option>
+          <option value="age_asc">Youngest first</option>
+          <option value="age_desc">Oldest first</option>
+        </select>
+      </div>
+
+      <button class="ghost" id="clear" type="button">Clear</button>
+    </div>
+  </section>
+
+  <section class="results">
+    <div class="results-head">
+      <div id="count">—</div>
+      <div class="pager" id="pager-top"></div>
+    </div>
+    <div id="list" class="list"></div>
+    <div class="pager bottom" id="pager-bottom"></div>
+  </section>
+</main>
+
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <div class="boot-title">Loading database…</div>
+    <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
+    <div class="boot-detail" id="boot-detail">—</div>
+  </div>
+</div>
+
+<template id="card-tpl">
+  <article class="card">
+    <div class="avatar"><span></span></div>
+    <div class="body">
+      <div class="line1">
+        <h3 class="name"></h3>
+        <span class="badge src"></span>
+      </div>
+      <div class="meta"></div>
+      <div class="address"></div>
+      <div class="extra"></div>
+    </div>
+    <button class="expand" type="button" title="Show raw record">⋯</button>
+  </article>
+</template>
+
+<script src="/app.js"></script>
+</body>
+</html>
