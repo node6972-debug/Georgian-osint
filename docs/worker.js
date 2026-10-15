@@ -23,8 +23,12 @@ self.onmessage = async (e) => {
       }));
 
       for (const r of results) {
-        if (r.status === "fulfilled") records.push(...r.value);
-        else post({ type: "error", message: `Source failed: ${r.reason && r.reason.message}` });
+        if (r.status === "fulfilled") {
+          const rows = r.value;
+          for (let i = 0; i < rows.length; i++) records.push(rows[i]);
+        } else {
+          post({ type: "error", message: `Source failed: ${r.reason && r.reason.message}` });
+        }
       }
       post({ type: "loaded", count: records.length });
     }
