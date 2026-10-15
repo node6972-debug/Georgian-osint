@@ -45,7 +45,7 @@
   };
 
   // Relative path — resolves correctly under /repo/ on GitHub Pages.
-  const worker = new Worker("worker.js?v=7");
+  const worker = new Worker("worker.js?v=11");
 
   const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString("en-US"));
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
