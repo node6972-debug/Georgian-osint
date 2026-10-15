@@ -5,12 +5,12 @@
   // EDIT THESE TWO BLOCKS. Nothing else needs touching.
   // -----------------------------------------------------------------
   const SOURCE_URLS = [
-    {
+   /* {
       label: "2012 census",
       // Paste the URL from the Release asset here after you publish it.
       url: "https://github.com/node6972-debug/Georgian-osint/releases/download/data-v1/Georgia_2012_4.9m.csv.gz",
       gzipped: true,
-    },
+    },*/
     {
       label: "2016 registry",
       url: "data/georgian2016.txt.gz",
