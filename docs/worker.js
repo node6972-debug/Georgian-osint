@@ -13,9 +13,8 @@ self.onmessage = async (e) => {
       let completed = 0;
 
       const results = await Promise.allSettled(msg.sources.map(async (src) => {
-        const text = await fetchSource(src, (p) =>
+        const rows = await loadSource(src, (p) =>
           post({ type: "progress", p, label: `Loading ${src.label}` }));
-        const rows = parseCsvToRecords(text, src);
         completed++;
         post({ type: "progress", p: 1,
                label: `${src.label} parsed (${rows.length.toLocaleString()}) — ${completed}/${totalSources} done` });
@@ -66,6 +65,80 @@ async function fetchSource(src, onProgress) {
   }
   if (src.gzipped) bytes = await gunzip(bytes);
   return new TextDecoder("utf-8").decode(bytes);
+}
+
+
+async function loadSource(src, onProgress) {
+  if (src.chunks && src.chunks > 0) {
+    return await parseChunkedStream(src, onProgress);
+  }
+  const text = await fetchSource(src, onProgress);
+  return parseCsvToRecords(text, src);
+}
+
+async function parseChunkedStream(src, onProgress) {
+  // Fetch all gzipped chunks first (129 MB total — no text decode yet)
+  const parts = [];
+  for (let i = 0; i < src.chunks; i++) {
+    const url = `${src.baseUrl}.part-${chunkSuffix(i)}`;
+    const buf = await fetchBytes(url, (p) => onProgress(((i + p) / src.chunks) * 0.85));
+    parts.push(buf);
+  }
+  const bytes = concatBytes(parts);
+
+  // Stream decompress → decode → parse, never holding the full text string
+  const stream = new Blob([bytes]).stream()
+    .pipeThrough(new DecompressionStream("gzip"))
+    .pipeThrough(new TextDecoderStream("utf-8"));
+
+  const reader = stream.getReader();
+  const columns = src.columns || null;
+  const out = [];
+  let delim = null;
+  let buffer = "";
+  let lineNo = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += value;
+
+    if (delim === null && buffer.length >= 4096) {
+      delim = sniffDelimiter(buffer.slice(0, 4096));
+    }
+    if (delim === null) continue;
+
+    let pos = 0;
+    while (true) {
+      const nl = buffer.indexOf("\n", pos);
+      if (nl === -1) break;
+      const line = buffer.slice(pos, nl).replace(/\r$/, "");
+      pos = nl + 1;
+      lineNo++;
+      if (lineNo === 1) continue;
+      if (!line.trim()) continue;
+      const rec = columns
+        ? classifyByColumns(parseCsvLine(line, delim), columns, src)
+        : classifyLine(line, delim, src);
+      if (rec) out.push(rec);
+    }
+    buffer = buffer.slice(pos);
+  }
+
+  // Anything left after the last newline
+  if (delim === null) delim = sniffDelimiter(buffer.slice(0, 4096));
+  if (buffer.trim()) {
+    lineNo++;
+    if (lineNo > 1) {
+      const line = buffer.replace(/\r$/, "");
+      const rec = columns
+        ? classifyByColumns(parseCsvLine(line, delim), columns, src)
+        : classifyLine(line, delim, src);
+      if (rec) out.push(rec);
+    }
+  }
+
+  return out;
 }
 
 async function fetchBytes(url, onProgress) {
