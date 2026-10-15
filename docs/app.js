@@ -8,7 +8,7 @@
     {
       label: "2012 census",
       // Paste the URL from the Release asset here after you publish it.
-      url: "https://github.com/YOUR_USER/YOUR_REPO/releases/download/data-v1/Georgia_2012_4.9m.csv.gz",
+      url: "https://github.com/node6972-debug/Georgian-osint/releases/download/data-v1/Georgia_2012_4.9m.csv.gz",
       gzipped: true,
     },
     {
@@ -25,7 +25,7 @@
 
   const USE_JSDELIVR = false;
   const GITHUB_USER = "node6972-debug";
-  const GITHUB_REPO = "Georgian-Osint";
+  const GITHUB_REPO = "Georgian-osint";
   const GITHUB_REF  = "main";
   // -----------------------------------------------------------------
 
