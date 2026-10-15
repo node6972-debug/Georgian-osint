@@ -235,9 +235,47 @@ function classifyLine(raw, delim, source) {
   return rec;
 }
 
+function classifyByColumns(fields, columns, source) {
+  const rec = {
+    fn: null, ln: null, father: null, id: null,
+    dob: null, by: null, sex: null, addr: null, mob: null,
+    src: source.label || source.src,
+  };
+
+  for (let i = 0; i < columns.length && i < fields.length; i++) {
+    const val = fields[i] != null ? String(fields[i]).trim() : "";
+    if (!val) continue;
+    switch (columns[i]) {
+      case "id":       rec.id = val.replace(/\s/g, ""); break;
+      case "fn":       rec.fn = val; break;
+      case "ln":       rec.ln = val; break;
+      case "father":   rec.father = val; break;
+      case "dob": {
+        const [d, y] = parseDateField(val);
+        if (d) { rec.dob = d; rec.by = y; }
+        break;
+      }
+      case "sex":      rec.sex = normaliseSex(val); break;
+      case "sexNum":
+        if (val === "1") rec.sex = "M";
+        else if (val === "2") rec.sex = "F";
+        else rec.sex = normaliseSex(val);
+        break;
+      case "addr":     rec.addr = rec.addr ? rec.addr + " " + val : val; break;
+      case "district": rec.addr = rec.addr ? rec.addr + ", " + val : val; break;
+      case "mob":      rec.mob = normaliseMobile(val); break;
+      // "skip" and anything else → ignored
+    }
+  }
+
+  if (!rec.fn && !rec.ln && !rec.id && !rec.mob) return null;
+  return rec;
+}
+
 function parseCsvToRecords(text, source) {
   const delim = sniffDelimiter(text.slice(0, 4096));
   const out = [];
+  const columns = source.columns || null;
   let i = 0, n = text.length, lineNo = 0;
   while (i < n) {
     let j = text.indexOf("\n", i);
@@ -247,7 +285,9 @@ function parseCsvToRecords(text, source) {
     lineNo++;
     if (lineNo === 1) continue;   // skip header
     if (!line.trim()) continue;
-    const rec = classifyLine(line, delim, source);
+    const rec = columns
+      ? classifyByColumns(parseCsvLine(line, delim), columns, source)
+      : classifyLine(line, delim, source);
     if (rec) out.push(rec);
   }
   return out;
